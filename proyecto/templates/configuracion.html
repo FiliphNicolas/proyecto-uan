@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Configuración del Parqueadero</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/actualizar_configuracion">
+                    <div class="mb-3">
+                        <label for="tarifa" class="form-label">Tarifa por Hora (COP)</label>
+                        <input type="number" class="form-control" id="tarifa" name="tarifa" 
+                               value="{{ configuracion.tarifa_actual }}" step="0.01" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Actualizar Tarifa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Hora Simulada</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Hora actual: {{ configuracion.hora_simulada.strftime('%H:%M') }}</p>
+                <form method="POST" action="/avanzar_tiempo">
+                    <div class="mb-3">
+                        <label for="horas" class="form-label">Avanzar tiempo (horas)</label>
+                        <input type="number" class="form-control" id="horas" name="horas" min="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-info">Avanzar Tiempo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

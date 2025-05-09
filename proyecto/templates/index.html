@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2>Ingresar Carro</h2>
+        <form method="POST" action="/ingresar">
+            <div class="mb-3">
+                <label for="placa" class="form-label">Placa</label>
+                <input type="text" class="form-control" id="placa" name="placa" required>
+            </div>
+            <div class="mb-3">
+                <label for="hora_entrada" class="form-label">Hora de Entrada</label>
+                <input type="time" class="form-control" id="hora_entrada" name="hora_entrada" 
+                       min="06:00" max="21:00" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Ingresar</button>
+        </form>
+    </div>
+    
+    <div class="col-md-6">
+        <h2>Salir Carro</h2>
+        <form method="POST" action="/salir">
+            <div class="mb-3">
+                <label for="placa_salida" class="form-label">Placa</label>
+                <input type="text" class="form-control" id="placa_salida" name="placa" required>
+            </div>
+            <button type="submit" class="btn btn-danger">Salir</button>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Estadísticas</h5>
+                <p class="card-text"><strong>Hora actual:</strong> {{ hora_actual }}</p>
+                <p class="card-text">Puestos ocupados: {{ puestos|length - puestos|selectattr('estado', 'equalto', 'libre')|list|length }}</p>
+                <p class="card-text">Puestos libres: {{ puestos|selectattr('estado', 'equalto', 'libre')|list|length }}</p>
+                <p class="card-text">Porcentaje de ocupación: {{ ((puestos|length - puestos|selectattr('estado', 'equalto', 'libre')|list|length) / puestos|length * 100)|round(1) }}%</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Ingresos</h5>
+                <p class="card-text"><strong>Ingresos del día:</strong> ${{ '{:,.0f}'.format(ingresos_dia) }}</p>
+                <p class="card-text"><strong>Ingresos totales:</strong> ${{ '{:,.0f}'.format(ingresos_totales) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Últimas Transacciones</h5>
+                {% if ultimas_transacciones %}
+                    <div class="list-group list-group-flush">
+                    {% for transaccion in ultimas_transacciones %}
+                        <div class="list-group-item p-2">
+                            <strong>{{ transaccion.placa }}</strong><br>
+                            <small>Salida: {{ transaccion.hora_salida.strftime('%H:%M') }}</small><br>
+                            <small class="text-success">Pago: ${{ '{:,.0f}'.format(transaccion.valor_pagado) }}</small>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="card-text text-muted">No hay transacciones recientes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <h2>Puestos</h2>
+        <div class="row">
+            {% for puesto in puestos %}
+            <div class="col-md-3 mb-3">
+                <div class="card {% if puesto.estado == 'libre' %}border-success{% else %}border-danger{% endif %}">
+                    <div class="card-body">
+                        <h5 class="card-title">Puesto {{ puesto.numero }}</h5>
+                        <p class="card-text">Estado: {{ puesto.estado }}</p>
+                        {% if puesto.estado == 'ocupado' and puesto.carro_actual %}
+                            <p class="card-text"><strong>Placa:</strong> {{ puesto.carro_actual.placa }}</p>
+                            <p class="card-text"><strong>Ingreso:</strong> {{ puesto.carro_actual.hora_entrada.strftime('%H:%M') }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <form method="POST" action="/avanzar_tiempo">
+            <div class="mb-3">
+                <label for="horas" class="form-label">Avanzar tiempo (horas)</label>
+                <input type="number" class="form-control" id="horas" name="horas" min="1" required>
+            </div>
+            <button type="submit" class="btn btn-info">Avanzar Tiempo</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
